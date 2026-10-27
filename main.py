@@ -36,7 +36,10 @@ def main(page: ft.Page):
     lista_strumenti = ft.ListView(expand=True, spacing=5, padding=10, auto_scroll=True)
 
     # Tutti i TextField per le info necessarie per aggiungere un nuovo strumento (tipo, marca, anno, contatore posti)
-    # TODO
+    tipo = ft.TextField("Tipo")
+    marca = ft.TextField("Marca")
+    anno = ft.TextField("Anno acquisto")
+    prezzo = ft.TextField(value=0, disabled=True, width = 85)
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_strumenti():
@@ -55,14 +58,37 @@ def main(page: ft.Page):
         txt_responsabile.value = f"Responsabile: {deposito.get_responsabile()}"
 
     # Handlers per la gestione dei pulsanti utili all'inserimento di un nuovo strumento
-    # TODO
+    def handler_minus():
+        if prezzo.value > 0:
+            prezzo.value -= 50
+            prezzo.update()
+    def handler_plus():
+        prezzo.value += 50
+        prezzo.update()
+    btn_minus = ft.IconButton(icon=ft.Icons.REMOVE, icon_color= 'red', on_click=handler_minus)
+    btn_plus = ft.IconButton(icon=ft.Icons.ADD, icon_color = 'green', on_click=handler_plus)
+
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
     pulsante_conferma_responsabile = ft.Button("Conferma", on_click=conferma_responsabile)
 
     # Pulsanti per la gestione dell'inserimento di un nuovo strumento
-    # TODO
+    def aggiunta_strumento():
+        if not anno.value.isdigit():
+            alert.show_alert("❌ Errore: inserire un valore numerico per l'anno")
+        elif prezzo.value == 0:
+            alert.show_alert("❌ Errore: il prezzo non può essere 0")
+        else:
+            strumento = deposito.aggiungi_strumento(tipo.value, marca.value, anno.value, float(prezzo.value))
+            aggiorna_lista_strumenti()
+            tipo.value = "Tipo"
+            marca.value = "Marca"
+            anno.value = "Anno acquisto"
+            prezzo.value = 0
+
+
+    btn_aggiunta = ft.Button(content="Aggiungi strumento", on_click = aggiunta_strumento)
 
     # --- LAYOUT ---
     page.add(
@@ -80,7 +106,10 @@ def main(page: ft.Page):
                alignment=ft.MainAxisAlignment.CENTER),
 
         # Sezione 3
-        # TODO
+        ft.Divider(),
+        ft.Text("Aggiungi nuovo strumento", size=20),
+        ft.Row([tipo, marca, anno, btn_minus, prezzo, btn_plus], alignment=ft.MainAxisAlignment.CENTER),
+        btn_aggiunta,
 
         # Sezione 4
         ft.Divider(),
